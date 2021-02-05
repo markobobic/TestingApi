@@ -81,6 +81,7 @@
     <Compile Include="Utilis\ConfidenceLevel.cs" />
     <Compile Include="Utilis\ErrorMessages.cs" />
     <Compile Include="Utilis\FilterSearch.cs" />
+    <Compile Include="Utilis\Parametars.cs" />
     <Compile Include="Utilis\Print.cs" />
     <Compile Include="Initilizer\RunSmartyStreetsAPI.cs" />
     <Compile Include="Utilis\ReadFromResourse.cs" />

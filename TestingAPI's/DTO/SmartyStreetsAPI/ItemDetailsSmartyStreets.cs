@@ -14,7 +14,7 @@ namespace TestingAPI_s.DTO.SmartyStreetsAPI
     {
         public string primary_number { get; set; }
         public string street_name { get; set; }
-        public double street_suffix { get; set; }
+        public string street_suffix { get; set; }
         public string city_name { get; set; }
         public string default_city_name { get; set; }
         public string state_abbreviation { get; set; }

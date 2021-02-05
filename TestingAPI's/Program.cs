@@ -11,14 +11,14 @@ namespace TestingAPI_s
     {
         static void Main(string[] args)
         {
-            var nesto = ReadFromResourse.GeStreetList();
+
             Console.WriteLine("----------SEARCHING BY STREET----------");
-            RunSmartyStreetsAPI.StartSearchByStreetPrint(street: "20 jay st brooklyn");
-            RunRadarAPI.StartSearchByStreetPrint(street: "20 jay st brooklyn");
+            RunSmartyStreetsAPI.StartSearchByStreetPrint(street: "3301 South Greenfield Rd");
+            RunRadarAPI.StartSearchByStreetPrint(street: "3301 South Greenfield Rd");
             Console.WriteLine();
             Console.WriteLine("----------SEARCHING BY STREET AND ZIP CODE----------");
-            RunSmartyStreetsAPI.StartSearchByStreetAndZipPrint(street: "20 jay st brooklyn", zipCode: "11201");
-            RunRadarAPI.StartSearchByStreetAndZipPrint(street: "20 jay st brooklyn", zipCode: "11201");
+            RunSmartyStreetsAPI.StartSearchByStreetAndZipPrint(street: "3301 South Greenfield Rd", zipCode: "85297");
+            RunRadarAPI.StartSearchByStreetAndZipPrint(street: "3301 South Greenfield Rd", zipCode: "85297");
             Console.ReadLine();
         }
 

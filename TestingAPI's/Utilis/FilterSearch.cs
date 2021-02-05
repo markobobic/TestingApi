@@ -8,7 +8,9 @@ namespace TestingAPI_s.Utilis
 {
    public static class FilterSearch
     {
-        public const int MaxAddresses = 10;
+        public const string MaxCandidates = "1";
         public const string GeoLocation = "null";
+        public const string MatchInvalid = "invalid";
+        public const int MaxAddress = 10;
     }
 }

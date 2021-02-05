@@ -54,7 +54,7 @@ namespace TestingAPI_s.Factory
         }
         public string GetStateSearchByStreetAndZip(string street, string zipCode)
         {
-            var streetAndZipCode = string.Join(" ", street, zipCode);
+            var streetAndZipCode = string.Join("", street, zipCode);
             ClearAndAddParameterForStreet(streetAndZipCode);
             var response = client.Get<ItemDetailsRadar>(request);
             return response.Data.addresses.Select(x => x.stateCode).FirstOrDefault().ToString();
