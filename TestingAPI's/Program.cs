@@ -11,17 +11,22 @@ namespace TestingAPI_s
     {
         static void Main(string[] args)
         {
-
+            var txtResource = ReadFromResourse.GeStreetList();
             Console.WriteLine("----------SEARCHING BY STREET----------");
-            RunSmartyStreetsAPI.StartSearchByStreetPrint(street: "3301 South Greenfield Rd");
-            RunRadarAPI.StartSearchByStreetPrint(street: "3301 South Greenfield Rd");
+            TestRunner.SearchStreetFromAPI(StreetLookupFactory.Create(APIsOptions.Radar), txtResource);
+            TestRunner.SearchStreetFromAPI(StreetLookupFactory.Create(APIsOptions.SmartyStreets), txtResource);
+            TestRunner.SearchStreetFromAPI(StreetLookupFactory.Create(APIsOptions.OpenCage), txtResource);
+            TestRunner.SearchStreetFromAPI(StreetLookupFactory.Create(APIsOptions.LocationlQ), txtResource);
             Console.WriteLine();
-            Console.WriteLine("----------SEARCHING BY STREET AND ZIP CODE----------");
-            RunSmartyStreetsAPI.StartSearchByStreetAndZipPrint(street: "3301 South Greenfield Rd", zipCode: "85297");
-            RunRadarAPI.StartSearchByStreetAndZipPrint(street: "3301 South Greenfield Rd", zipCode: "85297");
+            //Console.WriteLine("----------SEARCHING BY STREET AND ZIP CODE----------");
+            //TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.Radar), txtResource);
+            //TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.SmartyStreets), txtResource);
+            //TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.OpenCage), txtResource);
+            //TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.LocationlQ), txtResource);
             Console.ReadLine();
         }
 
+        
     }
 }
 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TestingAPI_s.Utilis
+﻿namespace TestingAPI_s.Utilis
 {
     public static class ErrorMessages
     {
