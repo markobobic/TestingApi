@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TestingAPI_s.Core;
 using TestingAPI_s.DTO.OpenCageAPI;
 using TestingAPI_s.Enums;
 using TestingAPI_s.ExtensionMethods;
@@ -18,67 +19,34 @@ namespace TestingAPI_s.Factory
             _client = new RestClient("https://api.opencagedata.com/geocode/v1/");
         }
 
-        public APIsOptions GetNameOfAPI()
+        public List<string> GetStatesSearchByStreetAndZip(string street, string zipCode)
         {
-            return APIsOptions.OpenCage;
-        }
-
-        public string GetStateSearchByStreet(string street)
-        {
-            var request = new RestRequest("json");
-            SetQueryParameters(request,street);
-            var response = _client.Get<JSONDetailsOpenCage>(request);
-            return response.Data.Results.SelectMany(x => x.Components).Select(x => x.StateCode).FirstOrDefault();
-        }
-
-        public string GetStateSearchByStreetAndZip(string street, string zipCode)
-        {
-            var streetAndZipCode = string.Join(",", street, zipCode);
-            var request = new RestRequest("json");
-            SetQueryParameters(request, streetAndZipCode);
-            var response = _client.Get<JSONDetailsOpenCage>(request);
-            return response.Data.Results.SelectMany(x => x.Components).Select(x => x.StateCode).FirstOrDefault();
+            var response = SendRequest(street, zipCode);
+            return response.Data.Results.SelectMany(x => x.Components).Select(x => x.StateCode).ToList();
         }
 
         public List<string> GetStatesSearchByStreet(string street)
         {
-            Console.WriteLine("Radar API doesn't have feature for mulitple states");
-            return new List<string>();
+            var response = SendRequest(street);
+            return response.Data.Results.SelectMany(x => x.Components).Select(x => x.StateCode).ToList();
         }
 
-        public string GetZipCodeSearchByStreet(string street)
+        public List<string> GetZipCodesSearchByStreet(string street)
         {
-            var request = new RestRequest("json");
-            SetQueryParameters(request, street);
-            var response = _client.Get<JSONDetailsOpenCage>(request);
-            return response.Data.Results.SelectMany(x => x.Components).Select(x => x.Postcode).FirstOrDefault();
+            var response = SendRequest(street);
+            return response.Data.Results.SelectMany(x => x.Components).Select(x => x.Postcode).ToList();
         }
 
-        public (bool isValid, string accuracy) ValidateStreet(string street)
+        public ValidationResult ValidateStreet(string street)
         {
-            var request = new RestRequest("json");
-            SetQueryParameters(request,street);
-            var response = _client.Get<JSONDetailsOpenCage>(request);
-            var confidanceRate = response.Data.Results.Select(x => x.Confidence.TryParseNull()).FirstOrDefault();
-            var confidance = confidanceRate >= 9 ? ConfidenceLevel.Exact : (confidanceRate >= 5 ? ConfidenceLevel.Interpolated
-                : confidanceRate==0? ConfidenceLevel.Failed :ConfidenceLevel.Fallback);
-            if (confidance == ConfidenceLevel.Exact || confidance == ConfidenceLevel.Interpolated
-                || confidance == ConfidenceLevel.Fallback) return (true, confidance);
-            return (false, ConfidenceLevel.Failed);
+            var response = SendRequest(street);
+            return CheckValidationAndConfidance(response);
         }
 
-        public (bool isValid, string accuracy) ValidateStreetAndZip(string street, string zipCode)
+        public ValidationResult ValidateStreetAndZip(string street, string zipCode)
         {
-            var streetAndZipCode = string.Join(",", street, zipCode);
-            var request = new RestRequest("json");
-            SetQueryParameters(request,streetAndZipCode);
-            var response = _client.Get<JSONDetailsOpenCage>(request);
-            var confidanceRate = response.Data.Results.Select(x => x.Confidence.TryParseNull()).FirstOrDefault();
-            var confidance = confidanceRate >= 9 ? ConfidenceLevel.Exact : (confidanceRate >= 5 ? ConfidenceLevel.Interpolated
-                : confidanceRate == 0 ? ConfidenceLevel.Failed : ConfidenceLevel.Fallback);
-            if (confidance == ConfidenceLevel.Exact || confidance == ConfidenceLevel.Interpolated
-                || confidance == ConfidenceLevel.Fallback) return (true, confidance);
-            return (false, ConfidenceLevel.Failed);
+            var response = SendRequest(street, zipCode);
+            return CheckValidationAndConfidance(response);
         }
         private void SetQueryParameters(RestRequest request,string street)
         {
@@ -86,7 +54,31 @@ namespace TestingAPI_s.Factory
             request.AddQueryParameter(Params.OpenCageAPI.Query, street);
             request.AddQueryParameter(Params.OpenCageAPI.Language, "en");
             request.AddQueryParameter(Params.OpenCageAPI.Pretty, "1");
+            request.AddQueryParameter(Params.OpenCageAPI.CountryCode, "us");
         }
+        private IRestResponse<JSONDetailsOpenCage> SendRequest(string street, string zipCode = "")
+        {
+            var request = new RestRequest("json");
+            var streetAndZipCode = string.Join(" ", street, zipCode).TrimEnd();
+            SetQueryParameters(request, streetAndZipCode);
+            var response = _client.Get<JSONDetailsOpenCage>(request);
+            return response;
+        }
+        private ValidationResult CheckValidationAndConfidance(IRestResponse<JSONDetailsOpenCage> response)
+        {
+            var confidanceRate = response.Data.Results.Select(x => x.Confidence.TryParseNull()).FirstOrDefault();
+            var confidance = confidanceRate >= 9 ? ConfidenceLevel.Exact : (confidanceRate >= 5 ? ConfidenceLevel.Interpolated
+                : confidanceRate <=3 || confidanceRate == null ? ConfidenceLevel.Failed : ConfidenceLevel.Fallback);
+            if (confidance == ConfidenceLevel.Exact || confidance == ConfidenceLevel.Interpolated
+                || confidance == ConfidenceLevel.Fallback) return new ValidationResult(true, confidance);
+            return new ValidationResult(false, ConfidenceLevel.Failed);
+        }
+        public APIsOptions GetNameOfAPI()
+        {
+            return APIsOptions.OpenCage;
+        }
+
+       
         private static class APISecurityIdentification
         {
             public const string AuthKey = "e2a1a3e9e19f474d92c708d33afb75e3";

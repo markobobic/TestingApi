@@ -1,70 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using TestingAPI_s.Core;
 using TestingAPI_s.Enums;
 
 namespace TestingAPI_s.Utilis
 {
     public static class ConsoleStreetPrint
     {
-        public static void AllData(APIsOptions aPIsOptions,(bool isValid, string accuracy) validation,List<string> states=null,string state="",string zipCode="")
+        public static void Data(APIsOptions aPIsOptions,ValidationResult validation,List<string> states,string correctStateCode,List<string> zipCodes=null)
         {
             switch (aPIsOptions)
             {
-                case APIsOptions.Radar: RadarData(state,validation,zipCode); break;
-                case APIsOptions.SmartyStreets:SmartyStreetsData(validation, states, state); break;
-                case APIsOptions.OpenCage: OpenCageData(state, validation, zipCode); break;
-                case APIsOptions.LocationlQ: LocationlQData(validation, states, state); break;
+                case APIsOptions.SmartyStreets: Console.WriteLine("-----------SMARTY STREETS API-----------"); break;
+                case APIsOptions.Radar: Console.WriteLine("-----------RADAR API-----------"); break;
+                case APIsOptions.OpenCage: Console.WriteLine("-----------OPENCAGE API-----------"); break;
+                case APIsOptions.LocationlQ: Console.WriteLine("-----------LOCATIONLQ API-----------"); break;
+                case APIsOptions.HERE: Console.WriteLine("-----------HERE API-----------"); break;
+
             }
 
+            if (validation.IsValid == true && states.Count > 1) { 
+                states.ForEach(state => Console.WriteLine($"States: {state}"));
+            Console.WriteLine($"Validation:{validation.IsValid}");
+            Console.WriteLine($"Accuracy:{validation.Accuracy}");
+            }
+            if (validation.IsValid == true && states.Count ==1)
+                states.ForEach(state => Console.WriteLine($"State: {state}"));
+            if (validation.IsValid == false)
+            {
+                Console.WriteLine($"Validation:{validation.IsValid}");
+                Console.WriteLine($"Accuracy:{validation.Accuracy}");
+            }
+            Console.WriteLine($"Correct state code:{correctStateCode}");
+            Console.WriteLine($"Are matched: {states.Contains(correctStateCode)}");
         }
-        public static void SmartyStreetsData((bool isValid, string accuracy) validation, List<string> states = null, string state = "")
-        {
-            Console.WriteLine("-----------SMARTY STREETS API-----------");
-            if (validation.isValid == true && states.Count > 1 || states != null)
-                states.ForEach(x => Console.WriteLine($"State: {x}"));
-            Console.WriteLine($"Validation:{validation.isValid}");
-            Console.WriteLine($"Accuracy:{validation.accuracy}");
-            if (validation.isValid == true && state != string.Empty)
-                Console.WriteLine($"State:{state}");
-            if (validation.isValid == false)
-                Console.WriteLine($"Validation:{validation.isValid}");
-        }
-        public static void RadarData(string state, (bool isValid, string accuracy) validation, string zipCode="")
-        {
-            Console.WriteLine("-----------RADAR API-----------");
-            if (validation.isValid == true)
-            Console.WriteLine($"State:{state}");
-            Console.WriteLine($"ZipCode:{zipCode}");
-            Console.WriteLine($"Validation:{validation.isValid}");
-            Console.WriteLine($"Accuracy:{validation.accuracy}");
-            if (validation.isValid == false)
-                Console.WriteLine("There is no state, validation is false");
-
-        }
-        public static void OpenCageData(string state, (bool isValid, string accuracy) validation, string zipCode = "")
-        {
-            Console.WriteLine("-----------OPENCAGE API-----------");
-            if (validation.isValid == true)
-                Console.WriteLine($"State:{state}");
-            Console.WriteLine($"ZipCode:{zipCode}");
-            Console.WriteLine($"Validation:{validation.isValid}");
-            Console.WriteLine($"Accuracy:{validation.accuracy}");
-            if (validation.isValid == false)
-                Console.WriteLine("There is no state, validation is false");
-
-        }
-        public static void LocationlQData((bool isValid, string accuracy) validation, List<string> states = null, string state = "")
-        {
-            Console.WriteLine("-----------LOCATIONLQ API-----------");
-            if (validation.isValid == true && states.Count > 1 || states != null)
-                states.ForEach(x => Console.WriteLine($"Extended states: {x}"));
-            Console.WriteLine($"Validation:{validation.isValid}");
-            Console.WriteLine($"Accuracy:{validation.accuracy}");
-            if (validation.isValid == true && state != string.Empty)
-                Console.WriteLine($"Extended State:{state}");
-            if (validation.isValid == false)
-                Console.WriteLine($"Validation:{validation.isValid}");
-
-        }
+       
     }
 }

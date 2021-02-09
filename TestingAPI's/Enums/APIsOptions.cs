@@ -5,6 +5,7 @@
         SmartyStreets,
         Radar,
         OpenCage,
-        LocationlQ
+        LocationlQ,
+        HERE
     }
 }

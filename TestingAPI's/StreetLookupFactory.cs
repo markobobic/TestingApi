@@ -13,6 +13,7 @@ namespace TestingAPI_s.Factory
                 case APIsOptions.SmartyStreets: return new SmartyStreetsAPILookup();
                 case APIsOptions.OpenCage: return new OpenCageStreetLookup();
                 case APIsOptions.LocationlQ: return new LocationlQStreetLookup();
+                case APIsOptions.HERE: return new HEREAPIStreetLookup();
                 default: throw new ArgumentException("Invalid type", "type");
             }
         }

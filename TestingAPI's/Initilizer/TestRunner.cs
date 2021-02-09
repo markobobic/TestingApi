@@ -10,10 +10,10 @@ namespace TestingAPI_s.Initilizer
         {
             foreach (var data in textResource)
             {
-               var state = streetlookup.GetStateSearchByStreet(data.StreetName);
+               var states = streetlookup.GetStatesSearchByStreet(data.StreetName);
                var validation =streetlookup.ValidateStreet(data.StreetName);
-               var zipCode = streetlookup.GetZipCodeSearchByStreet(data.StreetName);
-                ConsoleStreetPrint.AllData(streetlookup.GetNameOfAPI(),validation,null,state,zipCode);
+               var zipCodes = streetlookup.GetZipCodesSearchByStreet(data.StreetName);
+               ConsoleStreetPrint.Data(streetlookup.GetNameOfAPI(),validation,states,data.StateCode,zipCodes);
             }
         }
 
@@ -21,9 +21,9 @@ namespace TestingAPI_s.Initilizer
         {
             foreach (var data in textResource)
             {
-                streetlookup.GetStateSearchByStreetAndZip(data.StreetName,data.ZipCode);
-                streetlookup.ValidateStreetAndZip(data.StreetName, data.ZipCode);
-                //ConsoleStreetPrint();
+                var states =streetlookup.GetStatesSearchByStreetAndZip(data.StreetName,data.ZipCode);
+                var validation=streetlookup.ValidateStreetAndZip(data.StreetName, data.ZipCode);
+                ConsoleStreetPrint.Data(streetlookup.GetNameOfAPI(), validation, states,data.StateCode);
             }
         }
     }

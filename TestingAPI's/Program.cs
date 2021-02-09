@@ -17,12 +17,14 @@ namespace TestingAPI_s
             TestRunner.SearchStreetFromAPI(StreetLookupFactory.Create(APIsOptions.SmartyStreets), txtResource);
             TestRunner.SearchStreetFromAPI(StreetLookupFactory.Create(APIsOptions.OpenCage), txtResource);
             TestRunner.SearchStreetFromAPI(StreetLookupFactory.Create(APIsOptions.LocationlQ), txtResource);
+            TestRunner.SearchStreetFromAPI(StreetLookupFactory.Create(APIsOptions.HERE), txtResource);
             Console.WriteLine();
-            //Console.WriteLine("----------SEARCHING BY STREET AND ZIP CODE----------");
-            //TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.Radar), txtResource);
-            //TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.SmartyStreets), txtResource);
-            //TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.OpenCage), txtResource);
-            //TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.LocationlQ), txtResource);
+            Console.WriteLine("----------SEARCHING BY STREET AND ZIP CODE----------");
+            TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.Radar), txtResource);
+            TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.SmartyStreets), txtResource);
+            TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.OpenCage), txtResource);
+            TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.LocationlQ), txtResource);
+            TestRunner.SearchStreetZipCodesFromAPI(StreetLookupFactory.Create(APIsOptions.HERE), txtResource);
             Console.ReadLine();
         }
 

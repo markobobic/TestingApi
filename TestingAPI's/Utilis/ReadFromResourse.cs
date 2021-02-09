@@ -10,10 +10,12 @@ namespace TestingAPI_s.Utilis
     {
         public string StreetName { get; set; }
         public string ZipCode { get; set; }
-        public StreetLookupInput(string streetName,string zipCode)
+        public string StateCode { get; set; }
+        public StreetLookupInput(string streetName,string zipCode,string stateCode)
         {
             StreetName = streetName;
             ZipCode = zipCode;
+            StateCode = stateCode;
         }
     }
 
@@ -32,9 +34,8 @@ namespace TestingAPI_s.Utilis
                      StringSplitOptions.None);
                 foreach (var item in array)
                 {
-                    var nesto = item;
                     var splited = item.Split(new string[] { "||" }, StringSplitOptions.None);
-                    var streetLookupInput = new StreetLookupInput(splited[0],splited[1]);
+                    var streetLookupInput = new StreetLookupInput(splited[0],splited[1],splited[2]);
                     streetLookupInputs.Add(streetLookupInput);
                 }
                 return streetLookupInputs;

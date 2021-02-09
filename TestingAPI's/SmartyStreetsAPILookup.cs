@@ -1,12 +1,12 @@
 ﻿using RestSharp;
 using SmartyStreets;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TestingAPI_s.DTO.SmartyStreetsAPI;
 using SmartyStreets.USAutocompleteApi;
 using TestingAPI_s.Utilis;
 using TestingAPI_s.Enums;
+using TestingAPI_s.Core;
 
 namespace TestingAPI_s.Factory
 {
@@ -31,39 +31,28 @@ namespace TestingAPI_s.Factory
             return ExecuteLookUp(street).Select(x => x.State).ToList();
         }
 
-        public (bool isValid, string accuracy) ValidateStreet(string street)
+        public ValidationResult ValidateStreet(string street)
         {
             var lookupResult = ExecuteLookUp(street);
-            if (lookupResult[0].State != ErrorMessages.NoStateFound) return (true, ConfidenceLevel.Exact);
-            return (false, ConfidenceLevel.Failed);
+            if (lookupResult[0].State != ErrorMessages.NoStateFound) return new ValidationResult(true, ConfidenceLevel.Exact);
+            return new ValidationResult(false, ConfidenceLevel.Failed);
         }
 
-        public string GetZipCodeSearchByStreet(string street)
+        public List<string> GetZipCodesSearchByStreet(string street)
         {
-            Console.WriteLine("Smarty Streets doesn't return Zip Code");
-            return string.Empty;
+            return new List<string> {"Smarty Streets doesn't return Zip Code" };
         }
 
-        public string GetStateSearchByStreet(string street)
+        public List<string> GetStatesSearchByStreetAndZip(string street, string zipCode)
         {
-            return ExecuteLookUp(street).Select(x => x.State).FirstOrDefault();
+            var response = SendRequest(street, zipCode);
+            return response.Data.SelectMany(x => x.Components).Select(x => x.StateAbbreviation).ToList();
         }
 
-        public string GetStateSearchByStreetAndZip(string street, string zipCode)
+        public ValidationResult ValidateStreetAndZip(string street, string zipCode)
         {
-            var request = new RestRequest("street-address");
-            SetQueryParameters(request,street, zipCode);
-            var response = _client.Get<List<JSONDetailsSmartyStreets>>(request);
-            return response.Data.SelectMany(x => x.Components).Select(x => x.StateAbbreviation).FirstOrDefault();
-        }
-
-        public (bool isValid, string accuracy) ValidateStreetAndZip(string street, string zipCode)
-        {
-            var request = new RestRequest("street-address");
-            SetQueryParameters(request,street, zipCode);
-            var response = _client.Get<List<JSONDetailsSmartyStreets>>(request);
-            if (response.Data.Count == 0) return (false, ConfidenceLevel.Failed);
-            return (true, ConfidenceLevel.Exact);
+            var response = SendRequest(street, zipCode);
+            return CheckValidationAndConfidance(response);
         }
 
         private void SetQueryParameters(RestRequest request,string street,string zipCode)
@@ -77,12 +66,24 @@ namespace TestingAPI_s.Factory
         }
         private Suggestion[] ExecuteLookUp(string street)
         {
-            _lookup = new SmartyStreets.USAutocompleteApi.Lookup(street);
+            _lookup = new Lookup(street);
             _lookup.GeolocateType = FilterSearch.GeoLocation;
             _lookup.MaxSuggestions = FilterSearch.MaxAddress;
             _clientLookup.Send(_lookup);
             if (_lookup.Result == null) return new Suggestion[] { new Suggestion { State = ErrorMessages.NoStateFound } };
             return _lookup.Result;
+        }
+        private IRestResponse<List<JSONDetailsSmartyStreets>> SendRequest(string street, string zipCode = "")
+        {
+            var request = new RestRequest("street-address");
+            SetQueryParameters(request,street,zipCode);
+            var response = _client.Get<List<JSONDetailsSmartyStreets>>(request);
+            return response;
+        }
+        private ValidationResult CheckValidationAndConfidance(IRestResponse<List<JSONDetailsSmartyStreets>> response)
+        {
+            if (response.Data.Count == 0) return new ValidationResult(false, ConfidenceLevel.Failed);
+            return new ValidationResult(true, ConfidenceLevel.Exact);
         }
 
         public APIsOptions GetNameOfAPI()

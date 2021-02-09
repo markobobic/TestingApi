@@ -5,9 +5,8 @@ namespace TestingAPI_s.Factory
 {
     public interface IStreetLookUp : ISearchStreetAndZip,INameOfAPI
     {
-        string GetStateSearchByStreet(string street);
         List<string> GetStatesSearchByStreet(string street);
-        string GetZipCodeSearchByStreet(string street);
-        (bool isValid, string accuracy) ValidateStreet(string street);
+        List<string> GetZipCodesSearchByStreet(string street);
+        ValidationResult ValidateStreet(string street);
     }
 }

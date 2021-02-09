@@ -1,6 +1,7 @@
 ﻿using RestSharp;
 using System.Collections.Generic;
 using System.Linq;
+using TestingAPI_s.Core;
 using TestingAPI_s.DTO.LocationlQAPI;
 using TestingAPI_s.Enums;
 using TestingAPI_s.Utilis;
@@ -9,11 +10,11 @@ namespace TestingAPI_s.Factory
 {
     public class LocationlQStreetLookup : IStreetLookUp
     {
-        private IRestClient client;
+        private IRestClient _client;
 
         public LocationlQStreetLookup()
         {
-            client = new RestClient("https://us1.locationiq.com/v1/");            
+            _client = new RestClient("https://us1.locationiq.com/v1/");            
         }
 
         public APIsOptions GetNameOfAPI()
@@ -21,60 +22,41 @@ namespace TestingAPI_s.Factory
             return APIsOptions.LocationlQ;
         }
 
-        public string GetStateSearchByStreet(string street)
-        {
-            var request = new RestRequest("search.php");
-            SetQueryParameters(request,street);
-            var response = client.Get<List<JSONDetailsLocationlQ>>(request);
-            return response.Data.SelectMany(x => x.Address).Select(y => y.State).FirstOrDefault();
-        }
-
-        public string GetStateSearchByStreetAndZip(string street, string zipCode)
+        public List<string> GetStatesSearchByStreetAndZip(string street, string zipCode)
         {
             System.Threading.Thread.Sleep(2000);
-            var request = new RestRequest("search.php");
-            var streetAndZipCode = string.Join(" ", street, zipCode);
-            SetQueryParameters(request,streetAndZipCode);
-            var response = client.Get<List<JSONDetailsLocationlQ>>(request);
-            return response.Data[0].Address == null?  ErrorMessages.NoStateFound: 
-                response.Data.SelectMany(x => x.Address).Select(y => y.ExtendedState).FirstOrDefault();
+            var response = SendRequest(street, zipCode);
+            return response.Data[0].Address == null? new List<string> { ErrorMessages.NoStateFound } : 
+                response.Data.SelectMany(x => x.Address).Select(y => y.ExtendedState).ToList();
         }
 
         public List<string> GetStatesSearchByStreet(string street)
         {
             System.Threading.Thread.Sleep(2000); //rate limit if api is consumed free
-            var request = new RestRequest("search.php");
-            SetQueryParameters(request, street);
-            var response = client.Get<List<JSONDetailsLocationlQ>>(request);
+            var response = SendRequest(street);
             return response.Data[0].Address == null ? new List<string> { ErrorMessages.NoStateFound } :
                  response.Data.SelectMany(x => x.Address).Select(y => y.ExtendedState).ToList();
         }
 
-        public string GetZipCodeSearchByStreet(string street)
+        public List<string> GetZipCodesSearchByStreet(string street)
         {
-            var request = new RestRequest("search.php");
-            SetQueryParameters(request, street);
-            var response = client.Get<List<JSONDetailsLocationlQ>>(request);
-            return response.Data.SelectMany(x => x.Address).Select(x => x.Postcode).FirstOrDefault();
+            System.Threading.Thread.Sleep(2000);
+            var response = SendRequest(street);
+            return response.Data.SelectMany(x => x.Address).Select(x => x.Postcode).ToList();
         }
 
-        public (bool isValid, string accuracy) ValidateStreet(string street)
+        public ValidationResult ValidateStreet(string street)
         {
-            var request = new RestRequest("search.php");
-            SetQueryParameters(request, street);
-            var response = client.Get<List<JSONDetailsLocationlQ>>(request);
-            if (response.Data[0].Address==null) return (false, ConfidenceLevel.Failed);
-            return (true, ConfidenceLevel.Exact);
+            var response = SendRequest(street);
+            if (response.Data[0].Address == null) return new ValidationResult(false, ConfidenceLevel.Failed);
+            return new ValidationResult(true, ConfidenceLevel.Exact);
         }
 
-        public (bool isValid, string accuracy) ValidateStreetAndZip(string street, string zipCode)
+        public ValidationResult ValidateStreetAndZip(string street, string zipCode)
         {
-            var request = new RestRequest("search.php");
-            var streetAndZipCode = string.Join(" ", street, zipCode);
-            SetQueryParameters(request,streetAndZipCode);
-            var response = client.Get<List<JSONDetailsLocationlQ>>(request);
-            if (response.Data[0].Address==null) return (false, ConfidenceLevel.Failed);
-            return (true, ConfidenceLevel.Exact);
+            var response = SendRequest(street, zipCode);
+            if (response.Data[0].Address==null) return new ValidationResult(false, ConfidenceLevel.Failed);
+            return new ValidationResult(true, ConfidenceLevel.Exact);
         }
 
         private void SetQueryParameters(RestRequest request, string street)
@@ -85,6 +67,15 @@ namespace TestingAPI_s.Factory
             request.AddQueryParameter(Params.LocationlQAPI.AddressDetails, "1");
             request.AddQueryParameter(Params.LocationlQAPI.Format, "json");
             request.AddQueryParameter(Params.LocationlQAPI.Postaladdress, "1");
+        }
+
+        private IRestResponse<List<JSONDetailsLocationlQ>> SendRequest(string street,string zipCode="")
+        {
+            var request = new RestRequest("search.php");
+            var streetAndZipCode = string.Join(" ", street, zipCode).TrimEnd();
+            SetQueryParameters(request, streetAndZipCode);
+            var response = _client.Get<List<JSONDetailsLocationlQ>>(request);
+            return response;
         }
 
         private static class APISecurityIdentification

@@ -24,6 +24,7 @@
             public const string Language = "language";
             public const string Pretty = "pretty";
             public const string Key = "key";
+            public const string CountryCode = "countrycode";
         }
 
         public static class LocationlQAPI
@@ -34,6 +35,15 @@
             public const string Format = "format";
             public const string Key = "key";
             public const string Postaladdress = "postaladdress";
+
+        }
+
+        public static class HEREAPI
+        {
+            public static string Bearer = "Bearer";
+            public static string ApiKey = "apiKey";
+            public const string Query = "qq";
+            public const string In = "in";
 
         }
 

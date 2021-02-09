@@ -70,6 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\INameOfAPI.cs" />
+    <Compile Include="Core\ValidationResult.cs" />
+    <Compile Include="DTO\HEREAPI\JSONDetailsHERE.cs" />
     <Compile Include="DTO\LocationlQAPI\JSONDetailsLocationlQ.cs" />
     <Compile Include="DTO\OpenCageAPI\JSONDetailsOpenCage.cs" />
     <Compile Include="DTO\RadarAPI\JSONDetailsRadar.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="Enums\APIsOptions.cs" />
     <Compile Include="ExtensionMethods\IntExtension.cs" />
     <Compile Include="ExtensionMethods\StringExtension.cs" />
+    <Compile Include="HEREAPIStreetLookup.cs" />
     <Compile Include="StreetLookupFactory.cs" />
     <Compile Include="Core\ISearchStreetAndZip.cs" />
     <Compile Include="Core\IStreetLookUp.cs" />
