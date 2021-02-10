@@ -93,8 +93,8 @@ namespace TestingAPI_s.Factory
 
         private  static  class APISecurityIdentification
         {
-            public const string AuthId = "cbc5700b-27a4-a562-a2e2-e9e8ec30638c";
-            public const string AuthToken = "TLld5U94YFK7fhg8WD4l";
+            public const string AuthId = "6ed9d44c-a080-fee2-fc4e-c87e2922eb63";
+            public const string AuthToken = "ZinXJP79afaeRiZXQsQQ";
         }
         
 

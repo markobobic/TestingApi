@@ -25,6 +25,7 @@
             public const string Pretty = "pretty";
             public const string Key = "key";
             public const string CountryCode = "countrycode";
+            public const string NoAnnotations = "no_annotations";
         }
 
         public static class LocationlQAPI

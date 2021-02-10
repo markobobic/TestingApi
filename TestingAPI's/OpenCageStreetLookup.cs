@@ -55,11 +55,12 @@ namespace TestingAPI_s.Factory
             request.AddQueryParameter(Params.OpenCageAPI.Language, "en");
             request.AddQueryParameter(Params.OpenCageAPI.Pretty, "1");
             request.AddQueryParameter(Params.OpenCageAPI.CountryCode, "us");
+            request.AddQueryParameter(Params.OpenCageAPI.NoAnnotations, "1");
         }
-        private IRestResponse<JSONDetailsOpenCage> SendRequest(string street, string zipCode = "")
+        private IRestResponse<JSONDetailsOpenCage> SendRequest(string street, string zipCode ="")
         {
             var request = new RestRequest("json");
-            var streetAndZipCode = string.Join(" ", street, zipCode).TrimEnd();
+            var streetAndZipCode = zipCode == "" ? street : string.Join(" ,", street, zipCode).TrimEnd();
             SetQueryParameters(request, streetAndZipCode);
             var response = _client.Get<JSONDetailsOpenCage>(request);
             return response;
