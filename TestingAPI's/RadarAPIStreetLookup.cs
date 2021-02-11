@@ -1,5 +1,4 @@
 ﻿using RestSharp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TestingAPI_s.Core;
@@ -15,18 +14,22 @@ namespace TestingAPI_s.Factory
 
         public RadarAPIStreetLookup()
         {
-            _client = new RestClient("https://api.radar.io/v1/geocode/");
+            _client = new RestClient("https://api.radar.io/v1/search/");
         }
        
         public List<string> GetStatesSearchByStreet(string street)
         {
             var response = SendRequest(street);
-            return response.Data.Addresses.Select(x => x.StateCode).ToList();
+            return response.Data.Addresses == null || response.Data.Addresses.Count == 0 || response.Data == null ?
+            new List<string> { ErrorMessages.NoStateFound } :
+            response.Data.Addresses.Select(x => x.StateCode==null?ErrorMessages.NoStateFound:x.StateCode).ToList();
         }
         public List<string> GetZipCodesSearchByStreet(string street)
         {
             var response = SendRequest(street);
-            return response.Data.Addresses.Select(x => x.PostalCode).ToList();
+            return response.Data.Addresses == null || response.Data.Addresses.Count == 0 || response.Data == null ?
+            new List<string> { ErrorMessages.NoPostalCodeFound } :
+            response.Data.Addresses.Select(x => x.PostalCode==null?ErrorMessages.NoPostalCodeFound:x.PostalCode).ToList();
         }
 
         public ValidationResult ValidateStreetAndZip(string street, string zipCode)
@@ -38,8 +41,8 @@ namespace TestingAPI_s.Factory
         public List<string> GetStatesSearchByStreetAndZip(string street, string zipCode)
         {
             var response = SendRequest(street, zipCode);
-            if (response.Data.Addresses.Count == 0) return new List<string> { ErrorMessages.NoStateAndZipFound };
-            return response.Data.Addresses.Select(x => x.StateCode == null ? ErrorMessages.NoStateAndZipFound : x.StateCode).ToList();
+            return response.Data.Addresses == null || response.Data.Addresses.Count==0 || response.Data == null ? new List<string> { ErrorMessages.NoStateFound } :
+             response.Data.Addresses.Select(x => x.StateCode == null ? ErrorMessages.NoStateAndZipFound : x.StateCode).ToList();
         }
 
         public ValidationResult ValidateStreet(string street)
@@ -52,21 +55,21 @@ namespace TestingAPI_s.Factory
         {
            request.AddHeader(Params.RadarAPI.Authorization, Authorization.Code);
            request.AddQueryParameter(Params.RadarAPI.Query, street);
+           request.AddQueryParameter(Params.RadarAPI.Limit, "100");
+           
         }
         private IRestResponse<JSONDetailsRadar> SendRequest(string street, string zipCode = "")
         {
-            var request = new RestRequest("forward");
-            var streetAndZipCode = string.Join(" ", street, zipCode).TrimEnd();
+            var request = new RestRequest("autocomplete");
+            var streetAndZipCode = string.Join(" ,", street, zipCode).TrimEnd();
             SetQueryParameters(request, streetAndZipCode);
             var response = _client.Get<JSONDetailsRadar>(request);
             return response;
         }
         private ValidationResult CheckValidationAndConfidance(IRestResponse<JSONDetailsRadar> response)
         {
-            if (response.Data.Addresses.Count == 0) return new ValidationResult(false, ConfidenceLevel.Failed);
-            var confidance = response.Data.Addresses.Select(x => x.Confidence).FirstOrDefault().ToString();
-            if (confidance == ConfidenceLevel.Exact || confidance == ConfidenceLevel.Interpolated ||
-                confidance == ConfidenceLevel.Fallback) return new ValidationResult(true, confidance);
+            if (response.Data.Addresses.Count == 1 && response.Data.Addresses != null) return new ValidationResult(true, ConfidenceLevel.Exact);
+            if (response.Data.Addresses.Count > 1 && response.Data.Addresses != null) return new ValidationResult(true, ConfidenceLevel.Interpolated);
             return new ValidationResult(false, ConfidenceLevel.Failed);
         }
         public APIsOptions GetNameOfAPI()

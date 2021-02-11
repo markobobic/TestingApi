@@ -5,6 +5,6 @@
         public const string MaxCandidates = "1";
         public const string GeoLocation = "US";
         public const string MatchInvalid = "invalid";
-        public const int MaxAddress = 10;
+        public const int MaxAddress = 100;
     }
 }

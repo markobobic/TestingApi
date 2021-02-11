@@ -11,10 +11,12 @@ namespace TestingAPI_s.Factory
     public class LocationlQStreetLookup : IStreetLookUp
     {
         private IRestClient _client;
+        private Dictionary<string, string> _listOfStates;
 
         public LocationlQStreetLookup()
         {
-            _client = new RestClient("https://us1.locationiq.com/v1/");            
+            _client = new RestClient("https://us1.locationiq.com/v1/");
+            _listOfStates = StateCodes.MakeListOfStatesAndStateCodes();
         }
 
         public APIsOptions GetNameOfAPI()
@@ -26,23 +28,30 @@ namespace TestingAPI_s.Factory
         {
             System.Threading.Thread.Sleep(2000);
             var response = SendRequest(street, zipCode);
-            return response.Data[0].Address == null? new List<string> { ErrorMessages.NoStateFound } : 
-                response.Data.SelectMany(x => x.Address).Select(y => y.ExtendedState).ToList();
+            return response.Data == null || response.Data[0].Address == null || response.Data[0].Address.Count == 0 ? 
+            new List<string> { ErrorMessages.NoStateFound } :
+            response.Data.SelectMany(x => x.Address).Select(y => y.ExtendedState).ToList()
+            .Select(state => StateCodes.GetStateCode(state, _listOfStates)).ToList();
+               
         }
 
         public List<string> GetStatesSearchByStreet(string street)
         {
             System.Threading.Thread.Sleep(2000); //rate limit if api is consumed free
             var response = SendRequest(street);
-            return response.Data[0].Address == null ? new List<string> { ErrorMessages.NoStateFound } :
-                 response.Data.SelectMany(x => x.Address).Select(y => y.ExtendedState).ToList();
+            return response.Data==null||response.Data[0].Address ==null || response.Data[0].Address.Count==0? new List<string> { ErrorMessages.NoStateFound } :
+            response.Data.SelectMany(x => x.Address).Select(y => y.ExtendedState).ToList()
+            .Select(state => StateCodes.GetStateCode(state, _listOfStates)).ToList();
         }
 
         public List<string> GetZipCodesSearchByStreet(string street)
         {
             System.Threading.Thread.Sleep(2000);
             var response = SendRequest(street);
-            return response.Data.SelectMany(x => x.Address).Select(x => x.Postcode).ToList();
+            return response.Data == null || response.Data[0].Address == null || response.Data[0].Address.Count == 0 ? 
+            new List<string> { ErrorMessages.NoPostalCodeFound } :
+            response.Data.SelectMany(x => x.Address)
+            .Select(x => x.Postcode==null?ErrorMessages.NoPostalCodeFound:x.Postcode).ToList();
         }
 
         public ValidationResult ValidateStreet(string street)
@@ -67,6 +76,7 @@ namespace TestingAPI_s.Factory
             request.AddQueryParameter(Params.LocationlQAPI.AddressDetails, "1");
             request.AddQueryParameter(Params.LocationlQAPI.Format, "json");
             request.AddQueryParameter(Params.LocationlQAPI.Postaladdress, "1");
+            request.AddQueryParameter(Params.LocationlQAPI.Limit, "1000");
         }
 
         private IRestResponse<List<JSONDetailsLocationlQ>> SendRequest(string street,string zipCode="")

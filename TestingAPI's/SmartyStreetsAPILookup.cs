@@ -28,7 +28,7 @@ namespace TestingAPI_s.Factory
 
         public List<string> GetStatesSearchByStreet(string street)
         {
-            return ExecuteLookUp(street).Select(x => x.State).ToList();
+            return ExecuteLookUp(street).Select(x => x.State==null?ErrorMessages.NoStateAndZipFound:x.State).ToList();
         }
 
         public ValidationResult ValidateStreet(string street)
@@ -46,7 +46,8 @@ namespace TestingAPI_s.Factory
         public List<string> GetStatesSearchByStreetAndZip(string street, string zipCode)
         {
             var response = SendRequest(street, zipCode);
-            return response.Data.SelectMany(x => x.Components).Select(x => x.StateAbbreviation).ToList();
+            return response.Data==null || response.Data[0].Components.Count==0 || response.Data[0].Components == null ? new List<string> { ErrorMessages.NoStateFound } :
+            response.Data.SelectMany(x => x.Components).Select(x => x.StateAbbreviation).ToList();
         }
 
         public ValidationResult ValidateStreetAndZip(string street, string zipCode)

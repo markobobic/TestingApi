@@ -16,6 +16,7 @@
         {
             public const string Query = "query";
             public const string Authorization = "Authorization";
+            public const string Limit = "limit";
         }
 
         public static class OpenCageAPI
@@ -26,6 +27,7 @@
             public const string Key = "key";
             public const string CountryCode = "countrycode";
             public const string NoAnnotations = "no_annotations";
+            public const string Limit = "limit";
         }
 
         public static class LocationlQAPI
@@ -36,6 +38,7 @@
             public const string Format = "format";
             public const string Key = "key";
             public const string Postaladdress = "postaladdress";
+            public const string Limit = "limit";
 
         }
 

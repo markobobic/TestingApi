@@ -1,5 +1,4 @@
 ﻿using RestSharp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TestingAPI_s.Core;
@@ -22,19 +21,28 @@ namespace TestingAPI_s.Factory
         public List<string> GetStatesSearchByStreetAndZip(string street, string zipCode)
         {
             var response = SendRequest(street, zipCode);
-            return response.Data.Results.SelectMany(x => x.Components).Select(x => x.StateCode).ToList();
+            return response.Data==null ||response.Data.Results==null || response.Data.Results.Count == 0 ? 
+            new List<string> { ErrorMessages.NoStateFound } :
+            response.Data.Results.SelectMany(x => x.Components)
+            .Select(x => x.StateCode==null?ErrorMessages.NoStateFound:x.StateCode).ToList();
         }
 
         public List<string> GetStatesSearchByStreet(string street)
         {
             var response = SendRequest(street);
-            return response.Data.Results.SelectMany(x => x.Components).Select(x => x.StateCode).ToList();
+            return response.Data == null || response.Data.Results == null || response.Data.Results.Count == 0 ? 
+            new List<string> { ErrorMessages.NoStateFound } :
+            response.Data.Results.SelectMany(x => x.Components)
+            .Select(x => x.StateCode == null ? ErrorMessages.NoStateFound : x.StateCode).ToList();
         }
 
         public List<string> GetZipCodesSearchByStreet(string street)
         {
             var response = SendRequest(street);
-            return response.Data.Results.SelectMany(x => x.Components).Select(x => x.Postcode).ToList();
+            return response.Data == null || response.Data.Results == null || response.Data.Results.Count == 0 ? 
+            new List<string> { ErrorMessages.NoPostalCodeFound } :
+            response.Data.Results.SelectMany(x => x.Components)
+            .Select(x => x.Postcode == null ? ErrorMessages.NoPostalCodeFound : x.Postcode).ToList();
         }
 
         public ValidationResult ValidateStreet(string street)
@@ -56,6 +64,7 @@ namespace TestingAPI_s.Factory
             request.AddQueryParameter(Params.OpenCageAPI.Pretty, "1");
             request.AddQueryParameter(Params.OpenCageAPI.CountryCode, "us");
             request.AddQueryParameter(Params.OpenCageAPI.NoAnnotations, "1");
+            request.AddQueryParameter(Params.OpenCageAPI.Limit, "100");
         }
         private IRestResponse<JSONDetailsOpenCage> SendRequest(string street, string zipCode ="")
         {

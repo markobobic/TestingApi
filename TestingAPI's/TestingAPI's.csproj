@@ -82,13 +82,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\INameOfAPI.cs" />
-    <Compile Include="Core\StatisticOfMatched.cs" />
+    <Compile Include="Core\Statistics.cs" />
+    <Compile Include="Core\StatisticsOfCorrectAddress.cs" />
+    <Compile Include="Core\StatisticsOfIncorrectAddress.cs" />
     <Compile Include="Core\ValidationResult.cs" />
     <Compile Include="DTO\HEREAPI\JSONDetailsHERE.cs" />
     <Compile Include="DTO\LocationlQAPI\JSONDetailsLocationlQ.cs" />
     <Compile Include="DTO\OpenCageAPI\JSONDetailsOpenCage.cs" />
     <Compile Include="DTO\RadarAPI\JSONDetailsRadar.cs" />
     <Compile Include="DTO\SmartyStreetsAPI\JSONDetailsSmartyStreets.cs" />
+    <Compile Include="Enums\AddressCorrectness.cs" />
     <Compile Include="Enums\APIsOptions.cs" />
     <Compile Include="ExtensionMethods\IntExtension.cs" />
     <Compile Include="ExtensionMethods\StringExtension.cs" />
@@ -107,11 +110,11 @@
     <Compile Include="Utilis\ConfidenceLevel.cs" />
     <Compile Include="Utilis\ErrorMessages.cs" />
     <Compile Include="Utilis\FilterSearch.cs" />
-    <Compile Include="Utilis\HeaderCount.cs" />
     <Compile Include="Utilis\Params.cs" />
     <Compile Include="Utilis\ConsoleStreetPrint.cs" />
     <Compile Include="Utilis\PathForWrittenFile.cs" />
     <Compile Include="Utilis\ReadFromResourse.cs" />
+    <Compile Include="Utilis\StateCodes.cs" />
     <Compile Include="Utilis\StatisticsToCsvFile.cs" />
   </ItemGroup>
   <ItemGroup>
